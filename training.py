@@ -377,16 +377,24 @@ def standardize_weights(y, sample_weight=None, class_weight=None,
         # TODO: proper error message
         assert y.shape[:sample_weight.ndim] == sample_weight.shape
         return sample_weight
+
     elif isinstance(class_weight, dict):
-        if len(y.shape) > 2:
+        #i changed this part to use class_weights to my FCN model.
+        #my model train with labels shaped by (nb_samples,1,1,2). 2 is the number of total classes.
+
+        if len(y.shape) == 4:
+            y_classes = y[:,0,0,:].argmax(axis=1)
+
+        elif len(y.shape) > 2:
             raise ValueError('class_weight not supported for '
-                             '3+ dimensional targets.')
-        if y.shape[1] > 1:
-            y_classes = y.argmax(axis=1)
-        elif y.shape[1] == 1:
-            y_classes = np.reshape(y, y.shape[0])
+                             '4+ dimensional targets.')
         else:
-            y_classes = y
+            if y.shape[1] > 1:
+                y_classes = y.argmax(axis=1)
+            elif y.shape[1] == 1:
+                y_classes = np.reshape(y, y.shape[0])
+            else:
+                y_classes = y
         weights = np.asarray([class_weight[cls] for cls in y_classes])
         return weights
     else:
