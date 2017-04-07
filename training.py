@@ -380,7 +380,7 @@ def standardize_weights(y, sample_weight=None, class_weight=None,
 
     elif isinstance(class_weight, dict):
         #i changed this part to use class_weights to my FCN model.
-        #my model train with labels shaped by (nb_samples,1,1,2). 2 is the number of total classes.
+        #my model train with labels shaped by (nb_samples,1,1,2). 2 is the number of total classes. In this method, y is the numpy array which is the training label.
 
         if len(y.shape) == 4:
             y_classes = y[:,0,0,:].argmax(axis=1)
@@ -396,6 +396,8 @@ def standardize_weights(y, sample_weight=None, class_weight=None,
             else:
                 y_classes = y
         weights = np.asarray([class_weight[cls] for cls in y_classes])
+        #the output weights is [i] where i is the weight values from class_weights.
+        #for example, [2 2 3 3 3 3 2 3 2 3] is the output weight in our case.
         return weights
     else:
         if sample_weight_mode is None:
